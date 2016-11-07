@@ -1,0 +1,40 @@
+{% extends 'CoreBundle::base.html.twig' %}
+
+{% block title %}OCPlatformBundle:Advert:view{% endblock %}
+
+{% block body %}
+    {% if not advert.categories.empty %}
+        <p>
+            Cette annonce est parue dans les catégories suivantes :
+            {% for category in advert.categories %}
+                {{ category.name }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    {% endif %}
+    <h1>{{ advert.title }}</h1>
+    <h3> par {{ advert.author }} le {{ advert.date|date('d/m/Y') }}
+    </h3>
+
+    <p>{{ advert.content }}</p>
+    {% if advert.image is not null %}
+        <img src="{{ advert.image.url }}" alt="{{ advert.image.alt }}">
+    {% endif %}
+
+    {% for application in listApplications %}
+        <div>
+            {{ application.author }}
+            {{ application.content }}
+            {{ application.date|date('d/m/Y') }}
+        </div>
+    {% endfor %}
+    {% if listAdvertSkills|length > 0 %}
+        <div>
+            Cette annonce requiert les compétences suivantes :
+            <ul>
+                {% for advertSkill in listAdvertSkills %}
+                    <li>{{ advertSkill.skill.name }} : niveau {{ advertSkill.level }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}

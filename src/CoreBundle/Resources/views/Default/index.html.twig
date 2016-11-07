@@ -1,0 +1,16 @@
+{% extends '@Core/base.html.twig' %}
+
+{% block body %}
+    <h1>Welcome to this beautiful website with no CSS yet !</h1>
+    {% for advert in adverts %}
+        {% if  adverts %}
+
+            <p>{{ advert.title }}</p>
+            <p>{{ advert.date|date }}</p>
+            <p>{{ advert.author }}</p>
+            <p>{{ advert.content }}</p>
+
+        {% endif %}
+    {% endfor %}
+
+{% endblock %}

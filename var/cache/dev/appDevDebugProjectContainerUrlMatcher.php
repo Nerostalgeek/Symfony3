@@ -100,13 +100,18 @@ class appDevDebugProjectContainerUrlMatcher extends Symfony\Bundle\FrameworkBund
 
         }
 
-        // core_default_index
+        // oc_core_home
         if (rtrim($pathinfo, '/') === '') {
             if (substr($pathinfo, -1) !== '/') {
-                return $this->redirect($pathinfo.'/', 'core_default_index');
+                return $this->redirect($pathinfo.'/', 'oc_core_home');
             }
 
-            return array (  '_controller' => 'CoreBundle\\Controller\\DefaultController::indexAction',  '_route' => 'core_default_index',);
+            return array (  '_controller' => 'OC\\CoreBundle\\Controller\\DefaultController::indexAction',  '_route' => 'oc_core_home',);
+        }
+
+        // oc_core_contact
+        if ($pathinfo === '/contact') {
+            return array (  '_controller' => 'OC\\CoreBundle\\Controller\\ContactController::indexAction',  '_route' => 'oc_core_contact',);
         }
 
         if (0 === strpos($pathinfo, '/platform')) {

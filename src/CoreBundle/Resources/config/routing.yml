@@ -1,7 +1,0 @@
-oc_platform_home:
-    path:      /{page}
-    defaults:
-        _controller: CoreBundle:Default:index
-        page:        1
-    requirements:
-        page: \d*

@@ -16,7 +16,8 @@
       <parameter key="DoctrineBundle">Doctrine\Bundle\DoctrineBundle\DoctrineBundle</parameter>
       <parameter key="SensioFrameworkExtraBundle">Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle</parameter>
       <parameter key="OCPlatformBundle">OC\PlatformBundle\OCPlatformBundle</parameter>
-      <parameter key="CoreBundle">CoreBundle\CoreBundle</parameter>
+      <parameter key="OCCoreBundle">OC\CoreBundle\OCCoreBundle</parameter>
+      <parameter key="RasFlashAlertBundle">Ras\Bundle\FlashAlertBundle\RasFlashAlertBundle</parameter>
       <parameter key="DebugBundle">Symfony\Bundle\DebugBundle\DebugBundle</parameter>
       <parameter key="WebProfilerBundle">Symfony\Bundle\WebProfilerBundle\WebProfilerBundle</parameter>
       <parameter key="SensioDistributionBundle">Sensio\Bundle\DistributionBundle\SensioDistributionBundle</parameter>
@@ -174,6 +175,7 @@
     <parameter key="swiftmailer.mailer.default.transport.smtp.auth_mode">null</parameter>
     <parameter key="swiftmailer.mailer.default.transport.smtp.timeout">30</parameter>
     <parameter key="swiftmailer.mailer.default.transport.smtp.source_ip">null</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.local_domain">null</parameter>
     <parameter key="swiftmailer.spool.default.memory.path">C:\wamp64\www\symfony3\var\cache\dev/swiftmailer/spool/default</parameter>
     <parameter key="swiftmailer.mailer.default.spool.enabled">true</parameter>
     <parameter key="swiftmailer.mailer.default.plugin.impersonate">null</parameter>
@@ -304,6 +306,11 @@
     <parameter key="sensio_framework_extra.converter.doctrine.class">Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter</parameter>
     <parameter key="sensio_framework_extra.converter.datetime.class">Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DateTimeParamConverter</parameter>
     <parameter key="sensio_framework_extra.view.listener.class">Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener</parameter>
+    <parameter key="ras_flash_alerts.options" type="collection">
+      <parameter key="template">RasFlashAlertBundle::layout.html.twig</parameter>
+      <parameter key="isAddStyles">true</parameter>
+      <parameter key="isAddJsAlertClose">true</parameter>
+    </parameter>
     <parameter key="web_profiler.debug_toolbar.position">bottom</parameter>
     <parameter key="web_profiler.debug_toolbar.intercept_redirects">false</parameter>
     <parameter key="web_profiler.debug_toolbar.mode">2</parameter>
@@ -489,7 +496,7 @@
                   <tag name="cache.pool"/>
                   <argument>wqMnJQf0ss</argument>
                   <argument>0</argument>
-                  <argument>zSQ7IZLV+1PoqQ0u4LblMQ</argument>
+                  <argument>ARWRy5kuu4nYKz-8h9BEOA</argument>
                   <argument>C:\wamp64\www\symfony3\var\cache\dev/pools</argument>
                   <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
                   <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
@@ -502,7 +509,7 @@
                   <tag name="cache.pool"/>
                   <argument>JzgxpivDjS</argument>
                   <argument>0</argument>
-                  <argument>zSQ7IZLV+1PoqQ0u4LblMQ</argument>
+                  <argument>ARWRy5kuu4nYKz-8h9BEOA</argument>
                   <argument>C:\wamp64\www\symfony3\var\cache\dev/pools</argument>
                   <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
                   <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
@@ -834,7 +841,7 @@
       <tag name="cache.pool"/>
       <argument>ep6q3SIpZe</argument>
       <argument>0</argument>
-      <argument>zSQ7IZLV+1PoqQ0u4LblMQ</argument>
+      <argument>ARWRy5kuu4nYKz-8h9BEOA</argument>
       <argument>C:\wamp64\www\symfony3\var\cache\dev/pools</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
@@ -1570,7 +1577,7 @@
       <argument type="collection">
         <argument type="service">
           <service class="Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider" public="false">
-            <argument>582089b24140a0.81140582</argument>
+            <argument>5821a0d7efa0d9.50372963</argument>
           </service>
         </argument>
       </argument>
@@ -1704,7 +1711,7 @@
         <argument type="service">
           <service class="Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener" public="false">
             <argument type="service" id="security.token_storage"/>
-            <argument>582089b24140a0.81140582</argument>
+            <argument>5821a0d7efa0d9.50372963</argument>
             <argument type="service" id="monolog.logger.security" on-invalid="null"/>
             <argument type="service" id="security.authentication.manager"/>
           </service>
@@ -1897,6 +1904,9 @@
         </argument>
       </call>
       <call method="addExtension">
+        <argument type="service" id="ras_flash_alert.twig.flash_alerts_extension"/>
+      </call>
+      <call method="addExtension">
         <argument type="service">
           <service class="Symfony\Bridge\Twig\Extension\DumpExtension" public="false">
             <tag name="twig.extension"/>
@@ -1960,17 +1970,24 @@
       <argument type="service" id="http_kernel"/>
       <argument>twig.controller.exception:showAction</argument>
     </service>
+    <service id="monolog.processor.psr_log_message" class="Monolog\Processor\PsrLogMessageProcessor" public="false"/>
     <service id="monolog.handler.main" class="Monolog\Handler\StreamHandler">
       <argument>C:\wamp64\www\symfony3\var\logs/dev.log</argument>
       <argument>100</argument>
       <argument>true</argument>
       <argument>null</argument>
+      <call method="pushProcessor">
+        <argument type="service" id="monolog.processor.psr_log_message"/>
+      </call>
     </service>
     <service id="monolog.handler.console" class="Symfony\Bridge\Monolog\Handler\ConsoleHandler">
       <tag name="kernel.event_subscriber"/>
       <argument>null</argument>
       <argument>true</argument>
       <argument type="collection"/>
+      <call method="pushProcessor">
+        <argument type="service" id="monolog.processor.psr_log_message"/>
+      </call>
     </service>
     <service id="swiftmailer.email_sender.listener" class="Symfony\Bundle\SwiftmailerBundle\EventListener\EmailSenderListener">
       <tag name="kernel.event_subscriber"/>
@@ -2212,6 +2229,29 @@
       <argument type="service" id="security.token_storage" on-invalid="null"/>
       <argument type="service" id="security.authorization_checker" on-invalid="null"/>
     </service>
+    <service id="ras_flash_alert.alert_manager" class="Ras\Bundle\FlashAlertBundle\Model\AlertManager">
+      <argument key="session" type="service" id="session"/>
+    </service>
+    <service id="ras_flash_alert.alert_reporter" class="Ras\Bundle\FlashAlertBundle\Model\AlertReporter">
+      <argument key="alertManager" type="service" id="ras_flash_alert.alert_manager"/>
+    </service>
+    <service id="ras_flash_alert.alert_publisher" class="Ras\Bundle\FlashAlertBundle\Model\AlertPublisher">
+      <argument key="alertManager" type="service" id="ras_flash_alert.alert_manager"/>
+    </service>
+    <service id="ras_flash_alert.twig.flash_alerts_extension" class="Ras\Bundle\FlashAlertBundle\Twig\FlashAlertsExtension">
+      <tag name="twig.extension"/>
+      <argument key="container" type="service" id="service_container"/>
+    </service>
+    <service id="ras_flash_alert.templating.flash_alerts_helper" class="Ras\Bundle\FlashAlertBundle\Templating\Helper\FlashAlertsHelper">
+      <tag name="templating.helper" alias="flashAlerts"/>
+      <argument key="templating" type="service" id="templating"/>
+      <argument key="alertPublisher" type="service" id="ras_flash_alert.alert_publisher"/>
+      <argument key="options" type="collection">
+        <argument key="template">RasFlashAlertBundle::layout.html.twig</argument>
+        <argument key="isAddStyles">true</argument>
+        <argument key="isAddJsAlertClose">true</argument>
+      </argument>
+    </service>
     <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
       <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" priority="240"/>
       <argument type="service" id="debug.stopwatch" on-invalid="ignore"/>
@@ -2337,9 +2377,6 @@
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
       </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
-      </call>
     </service>
     <service id="monolog.logger.translation" class="Symfony\Bridge\Monolog\Logger">
       <argument>translation</argument>
@@ -2348,9 +2385,6 @@
       </call>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
-      </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
       </call>
     </service>
     <service id="monolog.logger.cache" class="Symfony\Bridge\Monolog\Logger">
@@ -2361,9 +2395,6 @@
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
       </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
-      </call>
     </service>
     <service id="monolog.logger.templating" class="Symfony\Bridge\Monolog\Logger">
       <argument>templating</argument>
@@ -2372,9 +2403,6 @@
       </call>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
-      </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
       </call>
     </service>
     <service id="monolog.logger.profiler" class="Symfony\Bridge\Monolog\Logger">
@@ -2385,9 +2413,6 @@
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
       </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
-      </call>
     </service>
     <service id="monolog.logger.router" class="Symfony\Bridge\Monolog\Logger">
       <argument>router</argument>
@@ -2396,9 +2421,6 @@
       </call>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
-      </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
       </call>
     </service>
     <service id="monolog.logger.php" class="Symfony\Bridge\Monolog\Logger">
@@ -2409,14 +2431,11 @@
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
       </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
-      </call>
     </service>
     <service id="monolog.logger.event" class="Symfony\Bridge\Monolog\Logger">
       <argument>event</argument>
       <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
+        <argument type="service" id="monolog.handler.null_internal"/>
       </call>
     </service>
     <service id="monolog.logger.security" class="Symfony\Bridge\Monolog\Logger">
@@ -2427,23 +2446,14 @@
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
       </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
-      </call>
     </service>
     <service id="monolog.logger.doctrine" class="Symfony\Bridge\Monolog\Logger">
       <argument>doctrine</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
       </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
-      </call>
     </service>
-    <service id="monolog.handler.debug" class="Symfony\Bridge\Monolog\Handler\DebugHandler">
-      <argument>100</argument>
-      <argument>true</argument>
-    </service>
+    <service id="monolog.handler.null_internal" class="Monolog\Handler\NullHandler"/>
     <service id="session.storage.filesystem" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage">
       <argument>C:\wamp64\www\symfony3\var\cache\dev/sessions</argument>
       <argument>MOCKSESSID</argument>
@@ -2539,8 +2549,12 @@
         <argument>OCPlatform</argument>
       </call>
       <call method="addPath">
-        <argument>C:\wamp64\www\symfony3\src\CoreBundle/Resources/views</argument>
-        <argument>Core</argument>
+        <argument>C:\wamp64\www\symfony3\src\OC\CoreBundle/Resources/views</argument>
+        <argument>OCCore</argument>
+      </call>
+      <call method="addPath">
+        <argument>C:\wamp64\www\symfony3\vendor\ras\flash-alert-bundle\Ras\Bundle\FlashAlertBundle/Resources/views</argument>
+        <argument>RasFlashAlert</argument>
       </call>
       <call method="addPath">
         <argument>C:\wamp64\www\symfony3\vendor\symfony\symfony\src\Symfony\Bundle\DebugBundle/Resources/views</argument>
@@ -2567,9 +2581,6 @@
       </call>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
-      </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.debug"/>
       </call>
       <autowiring-type>Psr\Log\LoggerInterface</autowiring-type>
     </service>
@@ -2631,6 +2642,12 @@
       <call method="setSourceIp">
         <argument>null</argument>
       </call>
+      <configurator method="configure">
+        <service class="Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SmtpTransportConfigurator" public="false">
+          <argument>null</argument>
+          <argument type="service" id="router.request_context" on-invalid="null"/>
+        </service>
+      </configurator>
     </service>
     <service id="session.storage" alias="session.storage.native"/>
     <service id="event_dispatcher" alias="debug.event_dispatcher"/>
